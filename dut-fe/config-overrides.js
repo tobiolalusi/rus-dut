@@ -1,3 +1,5 @@
-module.exports = function override(config) {
-	return config;
-};
+const { override, addPostcssPlugins } = require("customize-cra");
+
+module.exports = override(
+	addPostcssPlugins([require("tailwindcss"), require("autoprefixer")])
+);
