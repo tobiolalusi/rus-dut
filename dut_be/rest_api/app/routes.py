@@ -1,5 +1,28 @@
 from . import app
-from flask import jsonify
+from flask import jsonify, current_app, Flask
+from .test import main_func
+from flask import send_file
+
+
+# app = Flask(__name__)
+# with app.app_context():
+#     # within this block, current_app points to app.
+#     print(current_app.name)
+
+@app.route('/app/return-cov/')
+def return_file_cov():
+    try:
+        return send_file('json_cov', attachment_filename='json_cov')
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/app/return-y/')
+def return_file_y():
+    try:
+        return send_file('json_y', attachment_filename='json_y')
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/app/measurementList1')
@@ -12,6 +35,13 @@ def getMeasurementList1():
 def getMeasurementList2():
     list = getTestValues2()
     return jsonify(results=list)
+
+
+@app.route('/app/cov_y')
+def get_cov_mat_and_y():
+    cov_mat, y = main_func()
+    return jsonify(y=list, cov=cov_mat)
+    # return jsonify(y=list)
 
 
 def getTestValues1():
@@ -60,3 +90,7 @@ def getTestValues2():
         {'x': 16, 'y': 21}
     ]
     return list
+
+
+if __name__ == '__main__':
+    app.run()
