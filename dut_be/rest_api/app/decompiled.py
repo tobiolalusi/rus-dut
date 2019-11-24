@@ -1,6 +1,7 @@
 import math, random, numpy as np
 from scipy.stats import random_correlation as rndcorr
 
+
 class port:
 
     def __init__(self, x, recal_hours=None):
@@ -21,7 +22,6 @@ class port:
         portNoise = self.random_generator.standard_normal() / 200
         return linDrift + portNoise
 
-
 class meas:
 
     def __init__(self, x, port_a, port_b, meas_time):
@@ -37,7 +37,6 @@ class DUT:
 
     def __init__(self, seed=None, usePort=True, expYield=None):
         """
-
         :param seed: optional
             if omitted, the seed is randomly generated internally
 
@@ -59,7 +58,8 @@ class DUT:
         self.DutMeasTime = 0
         self.dist_max = 0
         self.ports = [port(count) for count in range(self.numPorts)]
-        self.meas = [meas(count, np.random.randint(1, self.numPorts), np.random.randint(1, self.numPorts), np.random.randint(50, 5000000) * 1e-06) for count in range(self.numMeas)]
+        self.meas = [meas(count, np.random.randint(1, self.numPorts), np.random.randint(1, self.numPorts),
+                          np.random.randint(50, 5000000) * 1e-06) for count in range(self.numMeas)]
         for idx in range(self.numMeas):
             p_a = self.meas[idx].port_a
             p_b = self.meas[idx].port_b
@@ -87,7 +87,7 @@ class DUT:
 
     def info(self):
         return (
-         self.DutMeasTime, self.numMeas, self.numPorts, self.meas, self.ports, self.exp_yield)
+            self.DutMeasTime, self.numMeas, self.numPorts, self.meas, self.ports, self.exp_yield)
 
     def new_dut(self):
         """
@@ -122,6 +122,7 @@ class DUT:
         :return:
         """
         self.new_dut()
+
         for i in range(0, self.numMeas):
             t, result, dist = self.gen_meas_idx(i)
 
@@ -136,7 +137,10 @@ class DUT:
         meas_result = True
         porta = self.port_noise[self.meas[idx].port_a]
         portb = self.port_noise[self.meas[idx].port_b]
-        self.meas[idx].meas_dist = self.meas_noise[idx] ** 2
+        if idx <= 32:
+            self.meas[idx].meas_dist = self.meas_noise[idx] ** 2
+        else:
+            self.meas[idx].meas_dist = (self.meas_noise[idx] ** 2)/30
         self.measurement_time += self.meas[idx].meas_time
         if self.meas[idx].meas_dist > self.dist_max:
             self.dist_max = self.meas[idx].meas_dist
@@ -150,15 +154,15 @@ class DUT:
                 self.meas_result = False
                 meas_result = False
             return (
-             self.measurement_time, meas_result, self.meas[idx].meas_dist)
+                self.measurement_time, meas_result, self.meas[idx].meas_dist)
 
     def get_result(self):
         return (
-         self.measurement_time, self.meas_result, self.dist_max)
+            self.measurement_time, self.meas_result, self.dist_max)
 
     def get_time(self):
         return self.measurement_time
 
     def get_errordutcount(self):
         return (
-         self.errordutcount, self.errormeascount)
+            self.errordutcount, self.errormeascount)
